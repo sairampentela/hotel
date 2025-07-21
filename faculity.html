@@ -1,0 +1,358 @@
+<!-- Full updated HTML + JavaScript code -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faculty Login </title>
+  <link rel="icon" type="image/png" href="https://png.pngtree.com/png-clipart/20230804/original/pngtree-login-icon-round-design-web-vector-picture-image_9569620.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f7ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    h2 {
+      text-align: center;
+      color: #003366;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input, select, button {
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #cce0ff;
+    }
+    .no-data {
+      text-align: center;
+      color: red;
+      margin-top: 20px;
+    }
+    #bookingSection, #roomAllotModal, #receiptSection {
+      display: none;
+    }
+    .error {
+      color: red;
+      text-align: center;
+    }
+    #roomAllotModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+    #roomAllotModal .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 320px;
+    }
+    .room-button {
+      margin: 5px;
+      padding: 8px 15px;
+      background-color: #66b3ff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .room-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    #printButton {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #00cc66;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #printButton:hover {
+      background-color: #00994d;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #receiptSection, #receiptSection * {
+        visibility: visible;
+      }
+      #receiptSection {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="loginSection">
+    <h2>Faculty Login</h2>
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Enter username" />
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" class="error"></p>
+  </div>
+
+  <div id="bookingSection">
+    <h2>Room Booking Viewer</h2>
+    <label for="dateSelect">Select a Date:</label>
+    <input type="date" id="dateSelect" />
+    <button onclick="showBookings()">View Bookings</button>
+    <button onclick="showCheckoutData()">View Checkout Data</button>
+    <div id="resultContainer"></div>
+  </div>
+</div>
+
+<!-- Room Allot Modal -->
+<div id="roomAllotModal">
+  <div class="modal-content">
+    <h3>Select Room Type</h3>
+    <select id="roomTypeSelect" onchange="displayRoomsByType()">
+      <option value="">-- Select Type --</option>
+      <option value="Deluxe">Deluxe</option>
+      <option value="Executive">Executive</option>
+      <option value="Family">Family</option>
+      <option value="Single">Single</option>
+    </select>
+    <div id="availableRooms"></div>
+    <button onclick="closeRoomModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Receipt Section -->
+<div id="receiptSection">
+  <h2 id="receiptTitle">Room Allotment Receipt</h2>
+  <div id="receiptContent"></div>
+  <button id="printButton">Print Receipt</button>
+  <button onclick="backToBooking()" style="display:block;margin:10px auto;padding:10px 20px;background-color:#3366cc;color:white;border:none;border-radius:5px;">Back to Booking</button>
+</div>
+
+<script>
+let currentBookingIndex = null;
+
+function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const error = document.getElementById("loginError");
+
+  if (username === "faculty" && password === "admin123") {
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("bookingSection").style.display = "block";
+  } else {
+    error.textContent = "Invalid username or password.";
+  }
+}
+
+function showBookings() {
+  const date = document.getElementById("dateSelect").value;
+  const container = document.getElementById("resultContainer");
+  const allBookings = JSON.parse(localStorage.getItem("bookingData")) || [];
+
+  const filtered = allBookings
+    .map((b, index) => ({ ...b, originalIndex: index }))
+    .filter(b => date >= b.checkin && date < b.checkout && b.room !== null);
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<p class="no-data">No bookings for ${date}</p>`;
+    return;
+  }
+
+  let html = `<table><tr>
+    <th>Name</th><th>Email</th><th>Phone</th>
+    <th>Check-in</th><th>Check-out</th><th>Guests</th><th>Room</th><th>Payment</th><th>Action</th>
+  </tr>`;
+
+  filtered.forEach(b => {
+    html += `<tr>
+      <td>${b.name}</td><td>${b.email}</td><td>${b.phone}</td>
+      <td>${b.checkin}</td><td>${b.checkout}</td><td>${b.guests}</td>
+      <td style="color: ${b.room ? '#006600' : 'red'}; font-weight: bold;">
+        ${b.room ? b.room + " (Allotted)" : "Not Allotted"}
+      </td>
+      <td>${b.paymentMethod || "N/A"}</td>
+      <td>
+        ${b.room 
+          ? `<button onclick="checkout(${b.originalIndex})">Checkout</button>` 
+          : `<button onclick="openRoomModal(${b.originalIndex})">Allot Room</button>`}
+      </td>
+    </tr>`;
+  });
+
+  html += `</table>`;
+  container.innerHTML = `<div id="bookingTableWrapper">${html}</div>`;
+}
+
+const roomTypes = {
+  "Deluxe": [201, 202, 203],
+  "Executive": [301, 302],
+  "Family": [401, 402],
+  "Single": [101, 102, 103, 104]
+};
+
+function openRoomModal(index) {
+  currentBookingIndex = index;
+  document.getElementById("roomTypeSelect").value = "";
+  document.getElementById("availableRooms").innerHTML = "";
+  document.getElementById("roomAllotModal").style.display = "flex";
+}
+
+function closeRoomModal() {
+  document.getElementById("roomAllotModal").style.display = "none";
+}
+
+function displayRoomsByType() {
+  const type = document.getElementById("roomTypeSelect").value;
+  const allRooms = roomTypes[type] || [];
+  const today = new Date().toISOString().split("T")[0];
+  const bookings = JSON.parse(localStorage.getItem("bookingData")) || [];
+
+  const booked = bookings
+    .filter(b => b.roomType === type && b.room && b.checkout > today)
+    .map(b => b.room);
+
+  let buttons = "";
+  allRooms.forEach(room => {
+    const bookedNow = booked.includes(room);
+    buttons += `<button class="room-button" onclick="generateReceipt('${type}', ${room})" ${bookedNow ? "disabled" : ""}>
+      ${room}${bookedNow ? " (Booked)" : ""}</button>`;
+  });
+
+  document.getElementById("availableRooms").innerHTML = buttons;
+}
+
+function generateReceipt(type, roomNumber) {
+  closeRoomModal();
+  const bookings = JSON.parse(localStorage.getItem("bookingData")) || [];
+  const booking = bookings[currentBookingIndex];
+
+  booking.room = roomNumber;
+  booking.roomType = type;
+
+  localStorage.setItem("bookingData", JSON.stringify(bookings));
+
+  document.getElementById("receiptTitle").textContent = "Room Allotment Receipt";
+  document.getElementById("receiptContent").innerHTML = `
+    <p><strong>Name:</strong> ${booking.name}</p>
+    <p><strong>Email:</strong> ${booking.email}</p>
+    <p><strong>Phone:</strong> ${booking.phone}</p>
+    <p><strong>Check-in:</strong> ${booking.checkin}</p>
+    <p><strong>Check-out:</strong> ${booking.checkout}</p>
+    <p><strong>Guests:</strong> ${booking.guests}</p>
+    <p><strong>Room Type:</strong> ${type}</p>
+    <p><strong>Room Number:</strong> ${roomNumber}</p>
+    <p><strong>Payment:</strong> ${booking.paymentMethod || "N/A"}</p>
+    <p style="margin-top:30px;">Staff Signature: _____________________</p>
+  `;
+  document.getElementById("receiptSection").style.display = "block";
+  showBookings();
+}
+
+function checkout(index) {
+  if (confirm("Checkout this guest and release the room?")) {
+    const bookings = JSON.parse(localStorage.getItem("bookingData")) || [];
+    const checkoutList = JSON.parse(localStorage.getItem("checkoutData")) || [];
+    const b = bookings[index];
+
+    // Push to checkout data
+    checkoutList.push({ ...b });
+    localStorage.setItem("checkoutData", JSON.stringify(checkoutList));
+
+    // Generate receipt
+    document.getElementById("receiptTitle").textContent = "Checkout Receipt";
+    document.getElementById("receiptContent").innerHTML = `
+      <p><strong>Name:</strong> ${b.name}</p>
+      <p><strong>Email:</strong> ${b.email}</p>
+      <p><strong>Phone:</strong> ${b.phone}</p>
+      <p><strong>Check-in:</strong> ${b.checkin}</p>
+      <p><strong>Check-out:</strong> ${b.checkout}</p>
+      <p><strong>Guests:</strong> ${b.guests}</p>
+      <p><strong>Room Type:</strong> ${b.roomType || "N/A"}</p>
+      <p><strong>Room Number:</strong> ${b.room || "Released"}</p>
+      <p><strong>Payment:</strong> ${b.paymentMethod || "N/A"}</p>
+      <h3 style="color: green; margin-top: 30px;">Thank you, please visit again!</h3>
+      <p style="margin-top:30px;">Staff Signature: _____________________</p>
+    `;
+
+    // Clear room assignment
+    b.room = null;
+    b.roomType = null;
+
+    localStorage.setItem("bookingData", JSON.stringify(bookings));
+    document.getElementById("receiptSection").style.display = "block";
+    showBookings();
+  }
+}
+
+function backToBooking() {
+  document.getElementById("receiptSection").style.display = "none";
+  showBookings();
+}
+
+function showCheckoutData() {
+  const container = document.getElementById("resultContainer");
+  const checkoutList = JSON.parse(localStorage.getItem("checkoutData")) || [];
+
+  if (checkoutList.length === 0) {
+    container.innerHTML = `<p class="no-data">No checkout records available.</p>`;
+    return;
+  }
+
+  let html = `<h3>Checkout Records</h3><table><tr>
+    <th>Name</th><th>Email</th><th>Phone</th>
+    <th>Check-in</th><th>Check-out</th><th>Guests</th><th>Room</th><th>Payment</th>
+  </tr>`;
+
+  checkoutList.forEach(b => {
+    html += `<tr>
+      <td>${b.name}</td><td>${b.email}</td><td>${b.phone}</td>
+      <td>${b.checkin}</td><td>${b.checkout}</td><td>${b.guests}</td>
+      <td>${b.room || "Released"}</td><td>${b.paymentMethod || "N/A"}</td>
+    </tr>`;
+  });
+
+  html += `</table>`;
+  container.innerHTML = html;
+}
+
+document.getElementById("printButton").addEventListener("click", function () {
+  window.print();
+});
+</script>
+</body>
+</html>

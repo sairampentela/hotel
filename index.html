@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hostel Main Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url("https://3.imimg.com/data3/FM/MD/MY-1906485/hotel-booking.jpg") no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .overlay {
+      
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    header {
+      background-color: rgba(44, 62, 80, 0.85);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .center-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .bottom-circles {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .circle {
+      width: 70px;
+      height: 70px;
+      background-color: #004080;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.3s, background-color 0.3s;
+      text-decoration: none;
+      font-size: 12px;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .circle:hover {
+      transform: scale(1.1);
+      background-color: #0059b3;
+    }
+
+    footer {
+      background-color: rgba(44, 62, 80, 0.85);
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay">
+    <header>
+      <h1>Welcome to ABC Hostel Management</h1>
+    </header>
+
+    <div class="center-content">
+      <div class="bottom-circles">
+        <a href="room-booking.html" class="circle">Room</a>
+        <a href="hostel-booking.html" class="circle">Hostel</a>
+        <a href="#facilities" class="circle">Facilities</a>
+        <a href="faculty-login.html" class="circle">Faculty</a>
+      </div>
+    </div>
+
+    <footer>
+      &copy; 2025 ABC Hostel. All rights reserved.
+    </footer>
+  </div>
+
+</body>
+</html>

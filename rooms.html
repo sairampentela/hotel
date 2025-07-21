@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotel Rooms</title>
+  <link rel="icon" type="image/png" href="https://thumbs.dreamstime.com/b/hotel-icon-web-button-hotel-icon-web-button-vector-illustration-isolated-white-background-119872531.jpg">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fffaf0;
+    }
+
+    .header {
+      color: orangered;
+      background-color: burlywood;
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .room-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .room-box {
+      border: 2px dashed #4CAF50;
+      background-color: #f0f8ff;
+      width: 220px;
+      padding: 10px;
+      text-align: center;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .room-box:hover {
+      transform: scale(1.05);
+      background-color: #e0f7fa;
+    }
+
+    .room-box img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .room-name {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    .price::before {
+  content: "₹";
+}
+  </style>
+</head>
+<body>
+  <div class="header">Hotel Rooms</div>
+
+  <div class="room-container">
+    <div class="room-box">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDPVCB_m0YFIofAd7kWn_4Ta7UXhOE-u879A&s" alt="Deluxe Room">
+      <div class="room-name">Deluxe Room</div>
+      <p class="price">5000 per day</p>
+      <button>book now</button>
+    </div>
+    <div class="room-box">
+      <img src="https://www.thelalit.com/wp-content/uploads/2016/12/Executive-Suite-Bedroom-with-Bathroom-768x576.jpg" alt="Executive Suite">
+      <div class="room-name">Executive Suite</div>
+      <p class="price">7000 per day</p>
+      <button>book now</button>
+    </div>
+    <div class="room-box">
+      <img src="https://thejohnstownestate.com/wp-content/uploads/2020/10/Family-Room-_1200X800.jpg" alt="Family Room">
+      <div class="room-name">Family Room</div>
+      <p class="price">7000 per day</p>
+      <button>book now</button>
+    </div>
+    <div class="room-box">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzdXJLfktZCpCbaENaOm-PKZOgQq_cZAPVlw&s" alt="Single Room">
+      <div class="room-name">Single Room</div>
+      <p class="price">5000 per day</p>
+      <button>book now</button>
+    </div>
+   
+  </div>
+</body>
+</html>

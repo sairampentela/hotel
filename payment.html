@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff7e6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .box, .receipt {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 500px;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    select, button, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+    }
+    #upiField {
+      display: none;
+    }
+    .receipt {
+      display: none;
+      margin-top: 20px;
+    }
+    .receipt p {
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Select Payment Method</h2>
+    <select id="paymentMethod" onchange="toggleUPIField()">
+      <option value="">-- Select Payment Method --</option>
+      <option value="PhonePe">PhonePe</option>
+      <option value="Google Pay">Google Pay</option>
+      <option value="Paytm">Paytm</option>
+      <option value="Offline">Offline</option>
+    </select>
+
+    <div id="upiField">
+      <label for="upiId">Enter UPI ID:</label>
+      <input type="text" id="upiId" placeholder="example@upi">
+    </div>
+
+    <button onclick="savePayment()">Confirm Payment</button>
+  </div>
+
+  <div class="receipt" id="receipt">
+    <h3>Payment Receipt</h3>
+    <p><strong>Name:</strong> <span id="rName"></span></p>
+    <p><strong>Email:</strong> <span id="rEmail"></span></p>
+    <p><strong>Phone:</strong> <span id="rPhone"></span></p>
+    <p><strong>Room:</strong> <span id="rRoom"></span></p>
+    <p><strong>Guests:</strong> <span id="rGuests"></span></p>
+    <p><strong>Check-in:</strong> <span id="rCheckin"></span></p>
+    <p><strong>Check-out:</strong> <span id="rCheckout"></span></p>
+    <p><strong>Payment Method:</strong> <span id="rPayment"></span></p>
+    <p id="upiDisplay" style="display: none;"><strong>UPI ID:</strong> <span id="rUPI"></span></p>
+    <button onclick="window.print()">Print Receipt</button>
+  </div>
+
+  <script>
+    function toggleUPIField() {
+      const method = document.getElementById("paymentMethod").value;
+      const upiField = document.getElementById("upiField");
+
+      if (["PhonePe", "Google Pay", "Paytm"].includes(method)) {
+        upiField.style.display = "block";
+      } else {
+        upiField.style.display = "none";
+      }
+    }
+
+    function savePayment() {
+      const method = document.getElementById("paymentMethod").value;
+      const upiId = document.getElementById("upiId").value.trim();
+      const upiRequired = ["PhonePe", "Google Pay", "Paytm"].includes(method);
+
+      if (!method) {
+        alert("Please select a payment method.");
+        return;
+      }
+
+      if (upiRequired && upiId === "") {
+        alert("Please enter your UPI ID.");
+        return;
+      }
+
+      let bookings = JSON.parse(localStorage.getItem("bookingData")) || [];
+
+      if (!Array.isArray(bookings)) bookings = [bookings];
+
+      if (bookings.length > 0) {
+        const lastBooking = bookings[bookings.length - 1];
+        lastBooking.paymentMethod = method;
+        if (upiRequired) lastBooking.upiId = upiId;
+
+        localStorage.setItem("bookingData", JSON.stringify(bookings));
+
+        // Show receipt
+        document.getElementById("rName").innerText = lastBooking.name;
+        document.getElementById("rEmail").innerText = lastBooking.email;
+        document.getElementById("rPhone").innerText = lastBooking.phone;
+        document.getElementById("rRoom").innerText = lastBooking.room;
+        document.getElementById("rGuests").innerText = lastBooking.guests;
+        document.getElementById("rCheckin").innerText = lastBooking.checkin;
+        document.getElementById("rCheckout").innerText = lastBooking.checkout;
+        document.getElementById("rPayment").innerText = method;
+
+        if (upiRequired) {
+          document.getElementById("upiDisplay").style.display = "block";
+          document.getElementById("rUPI").innerText = upiId;
+        } else {
+          document.getElementById("upiDisplay").style.display = "none";
+        }
+
+        document.querySelector(".box").style.display = "none";
+        document.getElementById("receipt").style.display = "block";
+      } else {
+        alert("No booking data found.");
+      }
+    }
+  </script>
+</body>
+</html>
